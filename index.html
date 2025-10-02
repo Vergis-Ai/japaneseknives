@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SAKAI ICHIMONJI - Which Japanese knife is right for you ?- Demo</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 720px;
+    margin: 3em auto;
+    padding: 0 1em;
+    background: #f0f4fa;
+    color: #313131;
+    text-align: center;
+  }
+  h1, h2 {
+    text-align: center;
+    color: #0b79d0;
+  }
+  .question {
+    margin: 2em 0;
+  }
+  .options button {
+    margin: 0.5em 0.4em;
+    padding: 0.7em 1.4em;
+    cursor: pointer;
+    border: 2px solid #ccc; /* neutral border */
+    border-radius: 8px;
+    background-color: white;
+    font-size: 1rem;
+    min-width: 140px;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1); /* subtle shadow */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .options button:hover:not(.selected-option) {
+    background-color: #d6e9fc;
+  }
+  .selected-option {
+    background-color: #d9534f !important; /* red */
+    color: white !important;
+    border: 2px solid #b52b27 !important; /* darker red border */
+    box-shadow: 0 0 10px #b52b27cc !important; /* red shadow */
+    aria-pressed: true;
+  }
+  .nav-buttons {
+    margin-top: 2em;
+  }
+  .nav-buttons button {
+    padding: 0.8em 1.8em;
+    margin: 0 1em;
+    cursor: pointer;
+    background-color: #0b79d0;
+    color: white;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 1px 4px 12px rgba(11, 121, 208, 0.5);
+    transition: background-color 0.3s ease;
+    min-width: 110px;
+  }
+  .nav-buttons button:disabled {
+    background-color: #7fa8d9;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .nav-buttons button:hover:not(:disabled) {
+    background-color: #095a9d;
+  }
+  .results {
+    margin-top: 2.5em;
+    border-top: 1px solid #ccc;
+    padding: 1.5em 1em;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.1);
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  ul {
+    padding-left: 0;
+    list-style: none;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  li {
+    margin-bottom: 1em;
+    background: #e7f0ff;
+    border-radius: 8px;
+    padding: 1em;
+    box-shadow: inset 0 0 6px #a9cef7;
+    text-align: left;
+  }
+  .steel-info {
+    margin-top: 2em;
+    padding: 1.2em 1.5em;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fafafa;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 9px rgba(0,0,0,0.08);
+    text-align: left;
+  }
+  .steel-info h3 {
+    margin-top: 0;
+    color: #0b79d0;
+  }
+  @media (max-width: 480px) {
+    .options button {
+      min-width: 100%;
+      margin: 0.4em 0;
+    }
+    .nav-buttons button {
+      min-width: 130px;
+      margin: 0.7em 0.5em;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>SAKAI ICHIMONJI Knife Choice Helper - Demo</h1>
+
+<div id="helper"></div>
+
+<div class="nav-buttons" id="nav-buttons" style="display:none;">
+  <button id="back-btn">Back</button>
+  <button id="next-btn" disabled>Next</button>
+</div>
+
+<div class="results" id="results"></div>
+
+<div class="steel-info" id="steel-info" style="display:none;">
+  <h3>Steel Information</h3>
+  <div id="steel-description"></div>
+</div>
+
+<script>
+  // JavaScript code remains unchanged as per original provided code
+  const products = [
+    {
+      "name": "AUS10 Rin Damascus Stainless Kiritsuke-Gyuto",
+      "steel": "AUS 10 / Damascus",
+      "corrosion": 4,
+      "retention": 3,
+      "toughness": 4,
+      "type": "Kiritsuke-Gyuto",
+      "length": "UNKNOWN"
+    },
+    {
+      "name": "Blue Steel #1 Montanren Deba Knife",
+      "steel": "Blue Steel 1",
+      "corrosion": 2,
+      "retention": 4,
+      "toughness": 3,
+      "type": "Deba",
+      "length": "UNKNOWN"
+    },
+    {
+      "name": "Kirameki VG-10 Wa Gyuto Chef Knife",
+      "steel": "VG-10",
+      "corrosion": 5,
+      "retention": 4,
+      "toughness": 3,
+      "type": "Wa-Gyuto",
+      "length": "210MM"
+    },
+    { 
+      "name": "VG-1 Santoku Knife", 
+      "steel": "VG-1", 
+      "corrosion": 4, 
+      "retention": 4, 
+      "toughness": 4, 
+      "type": "Santoku", 
+      "length": "UNKNOWN" 
+    },
+    {
+      "name": "Blue Steel #2 Hongasumi Yanagiba Knife ( Left Hand )",
+      "steel": "Blue Steel 2",
+      "corrosion": 2,
+      "retention": 4,
+      "toughness": 3,
+      "type": "Yanagiba (LH)",
+      "length": "UNKNOWN"
+    },
+    {
+      "name": "AUS8 Tan Wa-Gyuto Chef Knife",
+      "steel": "AUS 8",
+      "corrosion": 5,
+      "retention": 2,
+      "toughness": 5,
+      "type": "Wa-Gyuto",
+      "length": "UNKNOWN"
+    },
+    {
+      "name": "Blue Steel Super Nakiri Knife",
+      "steel": "Blue Steel Super",
+      "corrosion": 3,
+      "retention": 4,
+      "toughness": 4,
+      "type": "Nakiri",
+      "length": "UNKNOWN"
+    }
+  ];
+
+  const steelInfo = {
+    "AUS 10 / Damascus": `
+      <p><strong>AUS 10 / Damascus</strong> is a high-quality stainless Damascus steel with balanced corrosion resistance and toughness.</p>
+      <ul>
+        <li>Corrosion Resistance: Good (4/5)</li>
+        <li>Edge Retention: Moderate (3/5)</li>
+        <li>Toughness: Good (4/5)</li>
+      </ul>`,
+    "Blue Steel 1": `
+      <p><strong>Blue Steel 1</strong> is a very hard steel known for sharpness but it requires diligent rust prevention.</p>
+      <ul>
+        <li>Corrosion Resistance: Low (2/5)</li>
+        <li>Edge Retention: High (4/5)</li>
+        <li>Toughness: Moderate (3/5)</li>
+      </ul>`,
+    "Blue Steel 2": `
+      <p><strong>Blue Steel 2</strong> offers improved rust resistance with strong edge retention over Blue Steel 1.</p>
+      <ul>
+        <li>Corrosion Resistance: Low-Moderate (2/5)</li>
+        <li>Edge Retention: High (4/5)</li>
+        <li>Toughness: Moderate (3/5)</li>
+      </ul>`,
+    "VG-10": `
+      <p><strong>VG-10</strong> is premium Japanese stainless steel, excellent corrosion resistance and edge holding.</p>
+      <ul>
+        <li>Corrosion Resistance: Excellent (5/5)</li>
+        <li>Edge Retention: High (4/5)</li>
+        <li>Toughness: Moderate (3/5)</li>
+      </ul>`,
+    "VG-1": `
+      <p><strong>VG-1</strong> is well-balanced stainless steel for corrosion and durability.</p>
+      <ul>
+        <li>Corrosion Resistance: Good (4/5)</li>
+        <li>Edge Retention: High (4/5)</li>          <li>Toughness: Good (4/5)</li>
+      </ul>`,
+    "AUS 8": `
+      <p><strong>AUS 8</strong> stainless steel with higher toughness, medium retention.</p>
+      <ul>
+        <li>Corrosion Resistance: Excellent (5/5)</li>
+        <li>Edge Retention: Lower (2/5)</li>
+        <li>Toughness: Excellent (5/5)</li>
+      </ul>`,
+    "Blue Steel Super": `
+      <p><strong>Blue Steel Super</strong> is an advanced high-carbon steel balancing edge retention and toughness.</p>
+      <ul>
+        <li>Corrosion Resistance: Moderate (3/5)</li>
+        <li>Edge Retention: High (4/5)</li>
+        <li>Toughness: Good (4/5)</li>
+      </ul>`
+  };
+
+  function getUniqueFilteredSorted(arr) {
+    return [...new Set(arr.filter(e => e && e !== '---' && e.toLowerCase() !== 'unknown'))].sort();
+  }
+
+  const knifeTypes = getUniqueFilteredSorted(products.map(p => p.type));
+  const steelTypes = getUniqueFilteredSorted(products.map(p => p.steel));
+  const bladeLengths = getUniqueFilteredSorted(products.map(p => p.length));
+  bladeLengths.unshift("Any Length"); 
+
+  const questions = [
+    { question: "What type of knife do you want?", key: "type", options: knifeTypes },
+    { question: "What steel type do you prefer?", key: "steel", options: steelTypes },
+    { question: "Blade length preference?", key: "length", options: bladeLengths },
+    { question: "Which performance factor is most important to you?", key: "priority", options: ["corrosion", "retention", "toughness"] }
+  ];
+
+  let answers = {};
+  let currentStep = 0;
+
+  const helperDiv = document.getElementById('helper');
+  const resultsDiv = document.getElementById('results');
+  const navDiv = document.getElementById('nav-buttons');
+  const backBtn = document.getElementById('back-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const steelInfoDiv = document.getElementById('steel-info');
+  const steelDescDiv = document.getElementById('steel-description');
+
+  function calculateSimilarityScore(product) {
+    let score = 0;
+    if (product.type === answers.type) score += 3;
+    if (product.steel === answers.steel) score += 3;
+    if (answers.length !== "Any Length" && answers.length === product.length && product.length !== "UNKNOWN") {
+      score += 2;
+    } else if (answers.length === "Any Length") {
+      score += 1; 
+    }
+    return score;
+  }
+  
+  function formatPriorityKey(key) {
+    if (key === 'corrosion') return 'Corrosion Resistance';
+    if (key === 'retention') return 'Edge Retention';
+    if (key === 'toughness') return 'Toughness';
+    return key;
+  }
+
+  function filterProducts() {
+    return products.filter(p =>
+      p.type === answers.type &&
+      p.steel === answers.steel &&
+      (answers.length === "Any Length" || p.length === answers.length || p.length === "UNKNOWN")
+    );
+  }
+
+  function showResults() {
+    navDiv.style.display = 'none';
+    helperDiv.innerHTML = '';
+    steelInfoDiv.style.display = 'none';
+    resultsDiv.innerHTML = "<h2>Recommended Knives</h2>";
+
+    let filtered = filterProducts();
+
+    if (filtered.length === 0) {
+      const similarProducts = products
+        .map(p => ({ product: p, score: calculateSimilarityScore(p) }))
+        .filter(p => p.score > 0);
+
+      if (similarProducts.length === 0) {
+        resultsDiv.innerHTML += "<p>No products closely match your selections. Please try adjusting your preferences.</p>";
+        const restartBtn = document.createElement('button');
+        restartBtn.textContent = "Start Over";
+        restartBtn.onclick = () => { currentStep = 0; answers = {}; renderQuestion(); };
+        resultsDiv.appendChild(restartBtn);
+        return;
+      }
+
+      similarProducts.sort((a, b) => b.score - a.score);
+      const closest = similarProducts[0].product;
+
+      resultsDiv.innerHTML += `<p><em>We couldn't find a product that met your exact specifications, but here is the closest match based on your preferences:</em></p>`;
+
+      const ul = document.createElement('ul');
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>${closest.name}</strong><br />
+                      Steel: ${closest.steel} | Type: ${closest.type} | Blade Length: ${closest.length}<br />
+                      <em>Corrosion Resistance: ${closest.corrosion}, Edge Retention: ${closest.retention}, Toughness: ${closest.toughness}</em>`;
+      ul.appendChild(li);
+      resultsDiv.appendChild(ul);
+      return;
+    }
+
+    const priorityKey = answers.priority; 
+    filtered.sort((a, b) => b[priorityKey] - a[priorityKey]);
+
+    resultsDiv.innerHTML += `<p>Results sorted by your priority: <strong>${formatPriorityKey(priorityKey)}</strong>.</p>`;
+
+    const ul = document.createElement('ul');
+    filtered.forEach(p => {
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>${p.name}</strong><br />
+                      Steel: ${p.steel} | Type: ${p.type} | Blade Length: ${p.length}<br />
+                      <em>Corrosion Resistance: ${p.corrosion}, Edge Retention: ${p.retention}, Toughness: ${p.toughness}</em>`;
+      ul.appendChild(li);
+    });
+    resultsDiv.appendChild(ul);
+  }
+
+  function renderQuestion() {
+    resultsDiv.innerHTML = "";
+    steelInfoDiv.style.display = 'none';
+    navDiv.style.display = 'block';
+    nextBtn.disabled = true;
+    helperDiv.innerHTML = "";
+
+    const q = questions[currentStep];
+
+    const qDiv = document.createElement('div');
+    qDiv.className = "question";
+    qDiv.innerHTML = `<h2>${q.question}</h2>`; 
+
+    const optsDiv = document.createElement('div');
+    optsDiv.className = "options";
+
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.textContent = (q.key === 'priority' ? formatPriorityKey(opt) : opt); 
+
+      if (answers[q.key] === opt) {
+        btn.classList.add('selected-option');
+        nextBtn.disabled = false;
+      }
+
+      btn.onclick = () => {
+        [...optsDiv.children].forEach(b => {
+          b.classList.remove('selected-option');
+          b.setAttribute('aria-pressed', 'false'); 
+        });
+        
+        btn.classList.add('selected-option');
+        btn.setAttribute('aria-pressed', 'true'); 
+        
+        answers[q.key] = opt;
+        nextBtn.disabled = false;
+
+        if (q.key === 'steel') {
+          showSteelInfo(opt);
+        }
+      };
+      optsDiv.appendChild(btn);
+    });
+
+    qDiv.appendChild(optsDiv);
+    helperDiv.appendChild(qDiv);
+
+    backBtn.disabled = (currentStep === 0);
+
+    if (q.key === 'steel' && answers.steel) {
+      showSteelInfo(answers.steel);
+    } else {
+      steelInfoDiv.style.display = 'none';
+    }
+  }
+
+  function showSteelInfo(steelType) {
+    if (steelInfo[steelType]) {
+      steelDescDiv.innerHTML = steelInfo[steelType];
+      steelInfoDiv.style.display = 'block';
+    } else {
+      steelDescDiv.innerHTML = `<p>No detailed information available for <strong>${steelType}</strong>.</p>`;
+      steelInfoDiv.style.display = 'block';
+    }
+  }
+
+  backBtn.onclick = () => {
+    if (currentStep > 0) {
+      currentStep--;
+      renderQuestion();
+      resultsDiv.innerHTML = "";
+    }
+  };
+
+  nextBtn.onclick = () => {
+    if (currentStep < questions.length - 1) {
+      currentStep++;
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  };
+
+  renderQuestion();
+</script>
+
+</body>
+</html>
